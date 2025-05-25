@@ -1,27 +1,32 @@
 import express from 'express'
-import { mapOrder } from './utils/sorts.js'
+import exitHook from 'async-exit-hook'
+import { CONNECT_DB, CLOSE_DB } from './config/mongodb.js'
+import { env } from './config/environment.js'
 
-const app = express()
+const START_SERVER = () => {
+  const app = express()
 
-const hostname = 'localhost'
-const port = 8080
+  app.get('/', async (req, res) => {
 
-app.get('/', (req, res) => {
-  // Test Absolute import mapOrder
-  // eslint-disable-next-line no-console
-  console.log(mapOrder(
-    [{ id: 'id-1', name: 'One' },
-      { id: 'id-2', name: 'Two' },
-      { id: 'id-3', name: 'Three' },
-      { id: 'id-4', name: 'Four' },
-      { id: 'id-5', name: 'Five' }],
-    ['id-5', 'id-4', 'id-2', 'id-3', 'id-1'],
-    'id'
-  ))
-  res.end('<h1>Hello World!</h1><hr>')
-})
+    console.log(process.env)
+    res.end('<h1>Hello World!</h1><hr>')
+  })
 
-app.listen(port, hostname, () => {
-  // eslint-disable-next-line no-console
-  console.log(`I am running at http://${ hostname }:${ port }/`)
-})
+  app.listen(env.APP_PORT, env.APP_HORT, () => {
+    // eslint-disable-next-line no-console
+    console.log(`Hi ${env.AUTHOR},I am running at http://${ env.APP_HORT }:${ env.APP_PORT }/`)
+  })
+
+
+  exitHook(() => {
+    CLOSE_DB()
+  });
+}
+
+CONNECT_DB()
+  .then(() => console.log('Connected to MongoDb Cloud Atlas!'))
+  .then(() => START_SERVER())
+  .catch(error => {
+    console.error(error)
+    process.exit(0)
+  })
