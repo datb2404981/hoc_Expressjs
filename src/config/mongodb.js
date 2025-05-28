@@ -1,5 +1,4 @@
 /* eslint-disable no-unused-vars */
-import { env } from './config/environment.js'
 import { MongoClient, ServerApiVersion } from 'mongodb'
 
 let trelloDatabaseInstance = null;
